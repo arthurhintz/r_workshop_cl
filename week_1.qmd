@@ -1,0 +1,41 @@
+---
+title: "Week_1"
+format: html
+editor: visual
+---
+
+# Introduction
+
+## Install R and R studio
+
+R software: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe> RStudio: <https://posit.co/downloads>
+
+## Project, folder organization and good practices
+
+1.  Create a general folder for your research project.
+2.  Split your folder into data, outputs, Rscript, papers (personal way - there is no receipe)
+3.  Good practices: commenting the code - all information that you consider relevant. Outline (layout). Writing standard
+
+## Interface R
+
+## Logical programming
+
+## Operators: calculator and booleans
+
+## Types of data in R
+
+### Objects
+
+### Vectors
+
+### Matrices
+
+### Dataframe
+
+## Packages
+
+## Function
+
+## Loops
+
+# What is your goal?
