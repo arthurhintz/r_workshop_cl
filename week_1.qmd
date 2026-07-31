@@ -8,29 +8,42 @@ editor: visual
 
 ## Install R and R studio
 
-R software: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe> RStudio: <https://posit.co/downloads>
+R software: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe>
+
+RStudio: <https://posit.co/downloads>
 
 ## Project, folder organization and good practices
 
 1.  Create a general folder for your research project.
-2.  Split your folder into data, outputs, Rscript, papers (personal way - there is no receipe)
-3.  Good practices: commenting the code - all information that you consider relevant. Outline (layout). Writing standard
+1.  Split your folder into data, outputs, R script, papers (personal way - there is no recipe)
+1.  Good practices: commenting the code - all information that you consider relevant. Outline (layout). Writing standard
 
 ## Interface R
+1. Script
+1. Console
+1. Environment, 
+1. Files, plots, packages, help
 
 ## Logical programming
+1. 
 
 ## Operators: calculator and booleans
+1. +, -, /, \*, \%\*\%
+1. >, <, >=, <=, ==, !=, &, |
 
-## Types of data in R
+```{r}
 
-### Objects
 
-### Vectors
+```
 
-### Matrices
-
-### Dataframe
+## Types of objects in R
+1. Integer
+1. Numeric
+1. Character
+1. Logical
+1. Matrix
+1. Dataframe
+1. Obs: vector (not a type)
 
 ## Packages
 
@@ -39,3 +52,4 @@ R software: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe> RStudi
 ## Loops
 
 # What is your goal?
+
