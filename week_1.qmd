@@ -12,44 +12,191 @@ R software: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe>
 
 RStudio: <https://posit.co/downloads>
 
+R bible:
+
+Github:
+
 ## Project, folder organization and good practices
 
 1.  Create a general folder for your research project.
-1.  Split your folder into data, outputs, R script, papers (personal way - there is no recipe)
-1.  Good practices: commenting the code - all information that you consider relevant. Outline (layout). Writing standard
+2.  Split your folder into data, outputs, R script, papers (personal way - there is no recipe)
+3.  Good practices: commenting the code - all information that you consider relevant. Outline (layout). Writing standard
 
 ## Interface R
-1. Script
-1. Console
-1. Environment, 
-1. Files, plots, packages, help
+
+1.  R Script
+2.  Console
+3.  Environment,
+4.  Files, plots, packages, help
 
 ## Logical programming
-1. 
 
-## Operators: calculator and booleans
-1. +, -, /, \*, \%\*\%
-1. >, <, >=, <=, ==, !=, &, |
+Process thinking
+
+1 + 1 x 2
 
 ```{r}
+library(tidyverse)
+a <- 1:10
+
+a <- seq(1, 10, 1)
+
+sum(sqrt(a))
+a %>% 
+  sqrt() %>%
+  sum()
 
 
 ```
 
-## Types of objects in R
-1. Integer
-1. Numeric
-1. Character
-1. Logical
-1. Matrix
-1. Dataframe
-1. Obs: vector (not a type)
+## Shortcut
 
-## Packages
+**Ctrl + Enter** = run code
+
+**Alt + -** = "\<-"
+
+**Ctrl + Alt + i** = chunck
+
+**Ctrl + Shift + m** = %>% (pipe)
+
+**Ctrl + Shift + c** = add multiple comments
+
+
+## Operators: calculator and booleans
+
+1.  +, -, /, \*, %\*%, \^
+
+2.  \> , \<, \>=, \<=, ==, !=, &, \|
+
+```{r}
+2 ^ 3
+
+v = 2
+m =3 
+
+v * m
+
+```
+
+```{r}
+3 >2
+
+3 == 2
+
+&
+
+
+
+```
+
+
+## Types of objects in R
+
+Good names of object: short, clean, self explain, no space, no numbers, no special characters.
+
+1.  Integer
+2.  Numeric
+3.  Character
+4.  Logical
+5.  Matrix
+6.  Dataframe (Data structure board)
+7.  Obs: vector (not a type)
+
+```{r}
+a = 1
+a = as.integer(a)
+
+b = 2.3
+c = "Yuri"
+c <- c("2", "3")
+
+d = TRUE
+e = matrix(c(1:4), ncol = 2)
+f = data.frame(yield = c(80,90, 100),
+               N_rate = c(20, 50, 80),
+               Location = "Ashland",
+               wheat = c(T, T, F))
+
+```
+
+
+## Function and packages
+
+- What is a function?
+
+- What is a function? To execute a sequence of operation
+
+- Main functions
+
+1.  sum()
+
+2.  read_xlsx()
+
+3.  summary()
+
+4.  head(), tail()
+
+5.  str()
+
+6.  sqrt()
+
+7.  table()
+
+8.  seq()
+
+9.  lenght()
+
+1. Colnames()
+
+```{r}
+set.seed(10)
+rnorm(10, mean = 1, sd = 2)
+```
+
+- What is a package? It's a set of functions
+
+- How to install and use a package?
+
+```{r}
+# install.packages("")
+# "package":: to use just specific function
+# library()
+```
+
+- Main Packages
+
+1.  base - base package (already installed)
+
+2.  ggplot2 - data visualization
+
+3.  dplyr - data analysis
+
+4.  readxl - open excel file
 
 ## Function
 
+- How to create a function?
+
+Main structure
+
+```{r}
+new_function <- funtion(a, b, c){
+  
+  # command
+  
+  #return(result)
+  
+}
+```
+
+Arguments
+Fixed set of objects
+
+
 ## Loops
 
-# What is your goal?
 
+
+
+
+# What is your goal?
