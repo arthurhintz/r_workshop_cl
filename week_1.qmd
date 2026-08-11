@@ -8,24 +8,22 @@ editor: visual
 
 Welcome! This first session covers the basics you need to learning R: installing R and RStudio, organizing a project, understanding the RStudio interface, and the core building blocks of the R language (objects, functions, operators, and loops).
 
-
 ## Install R and R studio
 
 - **R** is the programming language and engine that actually runs your code.
 - **RStudio** is the interface (IDE) that makes working with R easier — script editor, console, plots, help.
 
-1. Install R: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe>
+1.  Install R: <https://cran.r-project.org/bin/windows/base/R-4.6.1-win.exe>
 
-2. Install RStudio: <https://posit.co/downloads>
+2.  Install RStudio: <https://posit.co/downloads>
 
-3. R bible: <https://r4ds.hadley.nz/>, *R for Data Science*
-
+3.  R bible: <https://r4ds.hadley.nz/>, *R for Data Science*
 
 ## Project and folder organization — good practices
 
-1.  Create one general folder per research project 
+1.  Create one general folder per research project
 2.  Split the folder into subfolders. A common structure (there's no single "correct" recipe, adapt to your workflow):
-    - `data/` — raw and processed data 
+    - `data/` — raw and processed data
     - `scripts/` (or `R/`) — your `.R` / `.qmd` scripts
     - `outputs/` — figures, tables, model results
     - `papers/` or `docs/` — literature, manuscripts, notes
@@ -46,7 +44,6 @@ RStudio is organized into four main panes:
 ## Logical programming
 
 Programming means telling the computer a precise sequence of steps — think of it as a recipe. Before writing code, it helps to think through the logic first: what are the inputs, what steps happen, what is the output?
-
 
 ## Keyboard shortcuts
 
@@ -93,11 +90,10 @@ Good object names: short, clear, self-explanatory, no spaces, avoid starting wit
 2.  **Numeric** (double) — decimal numbers
 3.  **Character** — text/strings
 4.  **Logical** — `TRUE` / `FALSE`
-5.  **Vector** — a sequence of values  
+5.  **Vector** — a sequence of values\
 6.  **Matrix** — a 2-dimensional structure
 7.  **Data frame** — a table with observation and variables
 8.  **List** — a flexible container that can hold objects of different types and sizes together
-
 
 ```{r}
 a <- 1
@@ -130,7 +126,6 @@ str(f)
 
 **What is a function?** A set of instructions, packaged under a name, that executes a sequence of operations on some input and returns a result. Instead of retyping the same steps every time, you call the function.
 
-
 **Common built-in functions:**
 
 1.  `sum()`
@@ -140,10 +135,12 @@ str(f)
 5.  `str()`
 6.  `sqrt()`
 7.  `table()`
-8.  `seq()`
+8.  `seq()`, `rep()`
 9.  `length()`
 10. `colnames()`
 11. `print()`
+12. `ncol()`, `nrow()`
+13. `paste()`
 
 ```{r}
 c(1,2,3,4,5,6,7,8,9,10)
@@ -169,12 +166,11 @@ seq(1, 10, 1)
 4.  **readxl** — reading Excel files
 5.  **tidyr** — reshaping data (long/wide formats)
 
-
 ## Writing your own function
 
 General structure:
 
-```{r, eval: false}
+```{r, eval=FALSE}
 
 new_function <- function(a, b, c) {
 
@@ -195,7 +191,6 @@ my_mean <- function(a, b) {
 my_mean(2, 4)
 ```
 
-
 ## Loops
 
 Loops repeat a task a set number of times, or until a condition is no longer true.
@@ -203,16 +198,16 @@ Loops repeat a task a set number of times, or until a condition is no longer tru
 - `for()` — repeat a fixed, known number of times
 - `while()` — repeat as long as a condition stays true
 
-
 Structure:
-```{r}
+
+```{r, eval=FALSE}
 n = 10
 for(i in 1:n){
   print(i)
 }
 ```
 
-```{r}
+```{r, eval=FALSE}
 i= 1
 while(i < n) {
   
@@ -223,14 +218,54 @@ while(i < n) {
 
 ```
 
-
 # Conditions
+
+Conditions let your code make decisions — run one block if something is true, and a different block if it's not.
+
+`if` and `else`
+
+The basic structure:
+
+```{r, eval=FALSE}
+if (condition) {
+  # runs only if condition is TRUE
+} else {
+  # runs only if condition is FALSE
+}
+```
+
+Exemple:
+
+```{r}
+grade <- 8
+
+if (grade > 7) {
+  print("Approved")
+} else {
+  print("Fail")
+}
+```
+
+`ifelse()`
+
+```{r, eval=FALSE}
+ifelse(condition, value_if_true, value_if_false)
+```
+
+```{r}
+yields <- c(40, 70, 60, 52, 81)
+
+ifelse(yields >= 60, "Good", "Low")
+```
 
 # Practice exercises
 
 1.  Create a vector `n_rates` with the values 0, 40, 80, 120, 160 (kg N/ha).
+
 2.  Create a data frame with three columns: `plot` (1 to 5), `n_rate` (`n_rates` above), and `yield` (make up five plausible wheat yield values).
-3.  Write a function `kg_to_lb(kg)` that converts kilograms to pounds (1 kg = 2.2046 lb) and test it on your `yield` column.
-4.  Write a `for` loop that prints "Plot X received Y kg N/ha" for each row of your data frame.
 
+3.  Write a function `kg_to_lb` that converts kilograms to pounds (1 kg = 2.2046 lb) and test it on your `yield` column.
 
+4.  Write a `for` loop that prints "Plot *X* received *Y* kg N/ha" for each row of your data frame.
+
+5.  Write a function `soil_ph()` that takes a single soil pH value as input and, using if/else, returns "Acidic" if the pH is below 7, and "Alkaline" if it's above 7.
