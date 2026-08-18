@@ -1,0 +1,384 @@
+---
+title: "Untitled"
+author: "Hintz A."
+date: "2026-08-17"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+# Introduction
+
+In this workshop, we will introduce some basic concepts of data analysis and data organization in R.
+
+
+# Packages
+
+Packages provide additional functions and datasets that extend the capabilities of R.
+
+For this workshop, we will use:
+
+- agridat: agricultural datasets;
+- tidyverse: a collection of packages for data manipulation, visualization, and analysis.
+
+```{r, message=FALSE, warning=F}
+library(agridat)
+library(tidyverse)
+```
+
+# Exploring the data
+
+## Selecting a Dataset
+
+The agridat package contains many datasets related to agricultural experiments.
+
+To see the datasets available in the package:
+
+```{r}
+data(package = "agridat")
+```
+
+For this workshop, we will use the sorghum dataset:
+```{r}
+dat <- agridat::adugna.sorghum
+
+head(dat)
+```
+  
+
+In practice, data are often stored in Excel or CSV files.
+
+For example, an Excel file can be imported using:
+
+```{r}
+# dat <- read_excel("path/to/your_file.xlsx")
+```
+
+A CSV file can be imported using:
+
+```{r}
+# dat <- read_csv("path/to/your_file.csv")
+```
+
+
+Question: What are the observations in this dataset? What does each row represent?
+
+
+## Structure of the Data
+
+Before analyzing a dataset, we should understand its structure.
+
+The str() function provides information about:
+
+- the number of observations;
+- the variables;
+- the type of each variable;
+- some example values.
+
+```{r}
+str(dat)
+```
+
+## Descriptive summary
+
+The summary() function provides a quick descriptive summary of each variable.
+
+```{r}
+summary(dat)
+```
+
+## Checking missing values
+
+In R, missing values are represented by NA.
+
+We can count the number of missing values in each variable using:
+
+```{r}
+colSums(is.na(dat))
+```
+
+If a variable contains missing values, we need to consider how they should be handled before performing an analysis.
+
+For example, when calculating a mean, we can use:
+
+```{r}
+mean(dat$yield, na.rm = TRUE)
+```
+
+The argument na.rm = TRUE tells R to remove missing values before calculating the mean.
+
+## Frequency table
+
+The table() function can be used to count combinations of categorical variables.
+
+For example, we can examine how many observations are available for each combination of location and year:
+
+```{r}
+table(dat$loc, dat$year)
+```
+
+
+# Pipes
+
+The pipe allows us to pass the result of one operation directly into another operation.
+
+There are two commonly encountered pipe operators in R:
+
+1.The native R pipe: |>
+1. The magrittr pipe: %>%
+
+For example:
+```{r}
+x <- c(1:10)
+
+sqrt(x)
+
+sum(sqrt(x))
+
+sqrt(x) |> 
+  sum()
+
+```
+
+The pipe makes it easier to read a sequence of operations from left to right.
+
+# The Tidyverse   
+
+The tidyverse is a collection of R packages designed to make data analysis easier and more consistent.
+
+One of the most commonly used packages in the tidyverse is dplyr, which provides functions for manipulating data.
+
+Some important dplyr functions are:
+
+- select() — select columns;
+- filter() — select rows;
+- arrange() — reorder rows;
+- mutate() — create or modify columns;
+- rename() — rename columns;
+- group_by() — define groups;
+- summarise() — calculate summaries.
+
+
+
+## Selecting Columns with select()
+
+The select() function is used to select columns from a data frame.
+
+First, we can look at the column names:
+
+```{r}
+colnames(dat)
+
+dat |> 
+  select(yield)
+
+```
+
+
+### Select Helpers
+
+The select() function can also use helper functions.
+
+  - starts_with()
+  - ends_with()
+  - contains(): 
+  - matches(): 
+  - num_range()
+        
+```{r}
+
+#Select variables whose names start with a specific character or string.
+dat |> select(starts_with("y"))
+
+# Select variables whose names end with a specific character or string.
+dat |> select(ends_with("loc"))
+
+#Select variables whose names contain a specific character or string.
+dat |> select(contains("e"))
+
+#matches() uses a regular expression to identify column names.
+#For example, to select variables whose names contain either "y" or "e":
+
+dat |> select(matches("y|e"))
+
+
+#num_range() is useful when variables follow a numerical naming pattern.
+#for example, suppose we have variables named G18, G19, and G20:
+
+dat_gen <- dat |> 
+  mutate(value = 1) |> 
+  pivot_wider(
+    names_from = gen,
+    values_from = value,
+    values_fill = 0
+)
+
+dat_gen |> select(num_range("G", 18:20))
+
+```
+
+
+### Selecting Columns Without Tidyverse
+
+The same operation can be performed using base R.
+
+```{r}
+dat2 <- dat[, c("env", "loc")]
+
+#We can also select columns by their position:
+dat2 <- dat[, c(3, 6)]
+```
+
+Both approaches work, but select() is often easier to read when working with more complicated data manipulation pipelines.
+
+
+
+"filter" function: select rows that satisfy a logic test
+      - between()
+```{r}
+# Select the trials in which 500 <= yield <= 700
+
+# Option 1: "between" function
+dat |> 
+  filter(between(yield, 500, 700))
+
+# Option 2: logical operations
+dat |> 
+  filter(yield >= 500 & yield <= 700)
+
+
+# Other common filter patterns:
+
+# Single condition: one location
+dat |> 
+  filter(loc == "Kobo")
+
+# Multiple values: keep rows matching any of several genotypes ("%in%" instead of chaining "|")
+dat |> 
+  filter(gen %in% c("G01", "G02", "G03"))
+
+# Combining conditions with "&" (AND) and "|" (OR)
+dat |> 
+  filter(loc == "Kobo" & year == 2001)
+
+dat |> 
+  filter(loc == "Kobo" | loc == "Melkassa")
+
+# Negation with "!"
+dat |> 
+  filter(!loc == "Kobo")
+```
+
+
+"arrange" function: orders the rows of a data frame
+```{r}
+# Reorder the data frame rows according to the highest-to-low yield order
+
+dat |> 
+  arrange(desc(yield))
+
+# Equivalent: arrange() sorts ascending by default, "-" flips it to descending
+dat |> 
+  arrange(-yield)
+
+# Sorting ascending, for comparison
+dat |> 
+  arrange(yield)
+
+# Sorting by multiple columns: location, then highest yield within each location
+dat |> 
+  arrange(loc, desc(yield))
+```
+
+
+"mutate" function: create new columns
+```{r}
+# Convert yield from kg/ha to t/ha
+dat |> 
+  mutate(yield_t = yield / 1000)
+
+# Create several columns at once, and reference a column created earlier in the same mutate()
+dat |> 
+  mutate(
+    yield_t = yield / 1000,
+    yield_t_round = round(yield_t, 2)
+  )
+
+# Combine with group_by() to create a column relative to a group,
+# e.g. each trial's yield deviation from its location's mean yield
+dat |> 
+  group_by(loc) |> 
+  mutate(
+    loc_mean_yield = mean(yield, na.rm = TRUE),
+    yield_dev = yield - loc_mean_yield
+  ) |> 
+  ungroup()
+
+# mutate() + case_when() to create a categorical column from a numeric one
+dat |> 
+  mutate(
+    yield_class = case_when(
+      yield < 500  ~ "low",
+      yield < 1000 ~ "medium",
+      TRUE         ~ "high"
+    )
+  )
+```
+
+
+"rename" function: change the name of a variable (column)
+```{r}
+# Change the name of gen and loc so that the new names were genotype and location, respectively.
+# rename(new_name = old_name)
+
+dat |> 
+  rename(genotype = gen, location = loc)
+
+# rename_with(): rename many columns at once with a function, e.g. make everything uppercase
+dat |> 
+  rename_with(toupper)
+
+# rename_with() + a helper: rename only columns matching a condition
+dat |> 
+  rename_with(toupper, .cols = c(gen, loc))
+```
+
+
+"across" function: select the columns to which you want to apply a function 
+```{r}
+# Coerce the year variable from type numeric (double) to type character
+dat |> 
+  mutate(across(year, as.character)) |> 
+  str()
+
+# across() with a tidyselect helper: apply the same function to every character/factor column
+dat |> 
+  mutate(across(where(is.factor), as.character)) |> 
+  str()
+
+# across() with multiple named columns
+dat |> 
+  mutate(across(c(gen, env, loc), as.character)) |> 
+  str()
+
+```
+
+
+# Group by and summarise
+
+```{r}
+
+dat |> 
+  group_by(loc) |> 
+  summarise(mean_loc = mean(yield),
+            min_yield = min(yield),
+            max_yield = max(yield))
+
+
+```
+
+
+
+
