@@ -525,9 +525,13 @@ dat_gen |&gt; select(num_range(&quot;G&quot;, 18:20))</code></pre>
 dat2 &lt;- dat[, c(3, 6)]</code></pre>
 <p>Both approaches work, but select() is often easier to read when
 working with more complicated data manipulation pipelines.</p>
-<p>“filter” function: select rows that satisfy a logic test -
-between()</p>
-<pre class="r"><code># Select the trials in which 500 &lt;= yield &lt;= 700
+</div>
+</div>
+<div id="filtering-rows-with-filter" class="section level2">
+<h2>Filtering rows with filter()</h2>
+<p>The filter() function selects observations that satisfy a logical
+condition.</p>
+<pre class="r"><code># Filtering a Range
 
 # Option 1: &quot;between&quot; function
 dat |&gt; 
@@ -538,66 +542,58 @@ dat |&gt;
   filter(yield &gt;= 500 &amp; yield &lt;= 700)
 
 
-# Other common filter patterns:
+# Filtering one location
 
-# Single condition: one location
-dat |&gt; 
-  filter(loc == &quot;Kobo&quot;)
+dat |&gt; filter(loc == &quot;Kobo&quot;)
 
-# Multiple values: keep rows matching any of several genotypes (&quot;%in%&quot; instead of chaining &quot;|&quot;)
-dat |&gt; 
-  filter(gen %in% c(&quot;G01&quot;, &quot;G02&quot;, &quot;G03&quot;))
+# Multiple values: 
+##The %in% operator is useful when we want to select several categories.
 
-# Combining conditions with &quot;&amp;&quot; (AND) and &quot;|&quot; (OR)
-dat |&gt; 
-  filter(loc == &quot;Kobo&quot; &amp; year == 2001)
+dat |&gt; filter(gen %in% c(&quot;G01&quot;, &quot;G02&quot;, &quot;G03&quot;))
 
-dat |&gt; 
-  filter(loc == &quot;Kobo&quot; | loc == &quot;Melkassa&quot;)
+# Combining conditions 
+#AND
 
-# Negation with &quot;!&quot;
-dat |&gt; 
-  filter(!loc == &quot;Kobo&quot;)</code></pre>
-<p>“arrange” function: orders the rows of a data frame</p>
+dat |&gt; filter(loc == &quot;Kobo&quot; &amp; year == 2001)
+
+# OR
+dat |&gt; filter(loc == &quot;Kobo&quot; | loc == &quot;Melkassa&quot;)
+
+# Negation
+dat |&gt; filter(loc != &quot;Kobo&quot;)</code></pre>
+</div>
+<div id="ordering-rows-with-arrange" class="section level2">
+<h2>Ordering Rows with arrange()</h2>
+<p>The arrange() function is used to reorder observations.</p>
 <pre class="r"><code># Reorder the data frame rows according to the highest-to-low yield order
-
-dat |&gt; 
-  arrange(desc(yield))
-
-# Equivalent: arrange() sorts ascending by default, &quot;-&quot; flips it to descending
-dat |&gt; 
-  arrange(-yield)
+dat |&gt; arrange(desc(yield))
 
 # Sorting ascending, for comparison
-dat |&gt; 
-  arrange(yield)
-
-# Sorting by multiple columns: location, then highest yield within each location
-dat |&gt; 
-  arrange(loc, desc(yield))</code></pre>
-<p>“mutate” function: create new columns</p>
+dat |&gt; arrange(yield)</code></pre>
+</div>
+<div id="creating-variables-with-mutate" class="section level2">
+<h2>Creating variables with mutate()</h2>
+<p>The mutate() function creates new variables or modifies existing
+variables.</p>
 <pre class="r"><code># Convert yield from kg/ha to t/ha
-dat |&gt; 
-  mutate(yield_t = yield / 1000)
-
-# Create several columns at once, and reference a column created earlier in the same mutate()
-dat |&gt; 
-  mutate(
-    yield_t = yield / 1000,
-    yield_t_round = round(yield_t, 2)
-  )
-
-# Combine with group_by() to create a column relative to a group,
-# e.g. each trial&#39;s yield deviation from its location&#39;s mean yield
-dat |&gt; 
+dat |&gt; mutate(yield_t = yield / 1000)</code></pre>
+<p>mutate() becomes particularly useful when combined with
+group_by().</p>
+<p>For example, we can calculate the mean yield for each location and
+then calculate the deviation of each observation from its location
+mean:</p>
+<pre class="r"><code>dat |&gt; 
   group_by(loc) |&gt; 
   mutate(
     loc_mean_yield = mean(yield, na.rm = TRUE),
     yield_dev = yield - loc_mean_yield
   ) |&gt; 
-  ungroup()
-
-# mutate() + case_when() to create a categorical column from a numeric one
+  ungroup()</code></pre>
+<p>The ungroup() function removes the grouping after the
+calculation.</p>
+<p>We can use case_when() to create categorical variables based on
+numerical values.</p>
+<pre class="r"><code># mutate() + case_when() to create a categorical column from a numeric one
 dat |&gt; 
   mutate(
     yield_class = case_when(
@@ -606,46 +602,64 @@ dat |&gt;
       TRUE         ~ &quot;high&quot;
     )
   )</code></pre>
-<p>“rename” function: change the name of a variable (column)</p>
-<pre class="r"><code># Change the name of gen and loc so that the new names were genotype and location, respectively.
-# rename(new_name = old_name)
-
-dat |&gt; 
-  rename(genotype = gen, location = loc)
-
-# rename_with(): rename many columns at once with a function, e.g. make everything uppercase
-dat |&gt; 
-  rename_with(toupper)
-
-# rename_with() + a helper: rename only columns matching a condition
-dat |&gt; 
-  rename_with(toupper, .cols = c(gen, loc))</code></pre>
-<p>“across” function: select the columns to which you want to apply a
-function</p>
-<pre class="r"><code># Coerce the year variable from type numeric (double) to type character
-dat |&gt; 
-  mutate(across(year, as.character)) |&gt; 
-  str()
-
-# across() with a tidyselect helper: apply the same function to every character/factor column
-dat |&gt; 
+</div>
+<div id="renaming-variables" class="section level2">
+<h2>Renaming Variables</h2>
+<p>The rename() function changes the name of a variable.</p>
+<pre class="r"><code>dat |&gt; rename(genotype = gen, location = loc)</code></pre>
+</div>
+<div id="using-across" class="section level2">
+<h2>Using across()</h2>
+<p>The across() function allows us to apply the same operation to
+multiple variables.</p>
+<pre class="r"><code>dat |&gt; 
   mutate(across(where(is.factor), as.character)) |&gt; 
   str()
 
-# across() with multiple named columns
 dat |&gt; 
   mutate(across(c(gen, env, loc), as.character)) |&gt; 
   str()</code></pre>
+<p>across() becomes especially useful when we need to apply the same
+transformation to many columns.</p>
 </div>
-</div>
-</div>
-<div id="group-by-and-summarise" class="section level1">
-<h1>Group by and summarise</h1>
+<div id="grouping-and-summarising" class="section level2">
+<h2>Grouping and summarising</h2>
+<p>The combination of group_by() and summarise() is one of the most
+useful tools for exploratory data analysis.</p>
+<p>group_by() defines the groups we want to analyze.</p>
+<p>summarise() calculates one or more summary statistics for each
+group.</p>
 <pre class="r"><code>dat |&gt; 
   group_by(loc) |&gt; 
   summarise(mean_loc = mean(yield),
             min_yield = min(yield),
             max_yield = max(yield))</code></pre>
+<pre class="r"><code>dat |&gt; 
+  group_by(loc, year) |&gt; 
+  summarise( mean_yield = mean(yield, na.rm = TRUE), 
+             n = n(),
+             .groups = &quot;drop&quot; )</code></pre>
+</div>
+</div>
+<div id="practice-exercises" class="section level1">
+<h1>Practice exercises</h1>
+<p>The exercises are based on the data <code>yield.xlsx</code>, so first
+read the file and save it in the object <code>df</code>.</p>
+<ol style="list-style-type: decimal">
+<li><p>Verify how many observations and variables are in the dataset and
+what are the categories of the variables.</p></li>
+<li><p>Select just the column <code>location</code>, <code>plot</code>,
+<code>block</code>, <code>trt</code>, <code>system</code>,
+<code>wheat_yield_bu_acre_13.5</code>,
+<code>soy_yield_bu_acre_13</code></p></li>
+<li><p>Rename the variables that contain the wheat and soybean
+yield.</p></li>
+<li><p>Verify if there are any NAs in the dataset.</p></li>
+<li><p>Filter only the SW system and calculate the mean wheat yield for
+each location.</p></li>
+<li><p>Calculate the mean and standard deviation for each system for
+wheat and soybean yield.</p></li>
+</ol>
 </div>
 
 

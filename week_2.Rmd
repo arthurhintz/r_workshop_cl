@@ -234,11 +234,13 @@ dat2 <- dat[, c(3, 6)]
 Both approaches work, but select() is often easier to read when working with more complicated data manipulation pipelines.
 
 
+## Filtering rows with filter()
 
-"filter" function: select rows that satisfy a logic test
-      - between()
+The filter() function selects observations that satisfy a logical condition.
+
+
 ```{r}
-# Select the trials in which 500 <= yield <= 700
+# Filtering a Range
 
 # Option 1: "between" function
 dat |> 
@@ -249,65 +251,57 @@ dat |>
   filter(yield >= 500 & yield <= 700)
 
 
-# Other common filter patterns:
+# Filtering one location
 
-# Single condition: one location
-dat |> 
-  filter(loc == "Kobo")
+dat |> filter(loc == "Kobo")
 
-# Multiple values: keep rows matching any of several genotypes ("%in%" instead of chaining "|")
-dat |> 
-  filter(gen %in% c("G01", "G02", "G03"))
+# Multiple values: 
+##The %in% operator is useful when we want to select several categories.
 
-# Combining conditions with "&" (AND) and "|" (OR)
-dat |> 
-  filter(loc == "Kobo" & year == 2001)
+dat |> filter(gen %in% c("G01", "G02", "G03"))
 
-dat |> 
-  filter(loc == "Kobo" | loc == "Melkassa")
+# Combining conditions 
+#AND
 
-# Negation with "!"
-dat |> 
-  filter(!loc == "Kobo")
+dat |> filter(loc == "Kobo" & year == 2001)
+
+# OR
+dat |> filter(loc == "Kobo" | loc == "Melkassa")
+
+# Negation
+dat |> filter(loc != "Kobo")
 ```
 
 
-"arrange" function: orders the rows of a data frame
+## Ordering Rows with arrange()
+
+The arrange() function is used to reorder observations.
+
 ```{r}
 # Reorder the data frame rows according to the highest-to-low yield order
-
-dat |> 
-  arrange(desc(yield))
-
-# Equivalent: arrange() sorts ascending by default, "-" flips it to descending
-dat |> 
-  arrange(-yield)
+dat |> arrange(desc(yield))
 
 # Sorting ascending, for comparison
-dat |> 
-  arrange(yield)
+dat |> arrange(yield)
 
-# Sorting by multiple columns: location, then highest yield within each location
-dat |> 
-  arrange(loc, desc(yield))
 ```
 
 
-"mutate" function: create new columns
+## Creating variables with mutate()
+
+The mutate() function creates new variables or modifies existing variables.
+
 ```{r}
 # Convert yield from kg/ha to t/ha
-dat |> 
-  mutate(yield_t = yield / 1000)
+dat |> mutate(yield_t = yield / 1000)
+```
 
-# Create several columns at once, and reference a column created earlier in the same mutate()
-dat |> 
-  mutate(
-    yield_t = yield / 1000,
-    yield_t_round = round(yield_t, 2)
-  )
 
-# Combine with group_by() to create a column relative to a group,
-# e.g. each trial's yield deviation from its location's mean yield
+mutate() becomes particularly useful when combined with group_by().
+
+For example, we can calculate the mean yield for each location and then calculate the deviation of each observation from its location mean:
+
+```{r}
 dat |> 
   group_by(loc) |> 
   mutate(
@@ -315,7 +309,14 @@ dat |>
     yield_dev = yield - loc_mean_yield
   ) |> 
   ungroup()
+```
 
+The ungroup() function removes the grouping after the calculation.
+
+
+We can use case_when() to create categorical variables based on numerical values.
+
+```{r}
 # mutate() + case_when() to create a categorical column from a numeric one
 dat |> 
   mutate(
@@ -328,45 +329,41 @@ dat |>
 ```
 
 
-"rename" function: change the name of a variable (column)
+## Renaming Variables
+
+The rename() function changes the name of a variable.
+
 ```{r}
-# Change the name of gen and loc so that the new names were genotype and location, respectively.
-# rename(new_name = old_name)
-
-dat |> 
-  rename(genotype = gen, location = loc)
-
-# rename_with(): rename many columns at once with a function, e.g. make everything uppercase
-dat |> 
-  rename_with(toupper)
-
-# rename_with() + a helper: rename only columns matching a condition
-dat |> 
-  rename_with(toupper, .cols = c(gen, loc))
+dat |> rename(genotype = gen, location = loc)
 ```
 
 
-"across" function: select the columns to which you want to apply a function 
-```{r}
-# Coerce the year variable from type numeric (double) to type character
-dat |> 
-  mutate(across(year, as.character)) |> 
-  str()
+## Using across()
 
-# across() with a tidyselect helper: apply the same function to every character/factor column
+The across() function allows us to apply the same operation to multiple variables.
+
+
+```{r}
 dat |> 
   mutate(across(where(is.factor), as.character)) |> 
   str()
 
-# across() with multiple named columns
 dat |> 
   mutate(across(c(gen, env, loc), as.character)) |> 
   str()
 
 ```
 
+across() becomes especially useful when we need to apply the same transformation to many columns.
 
-# Group by and summarise
+
+## Grouping and summarising
+
+The combination of group_by() and summarise() is one of the most useful tools for exploratory data analysis.
+
+group_by() defines the groups we want to analyze.
+
+summarise() calculates one or more summary statistics for each group.
 
 ```{r}
 
@@ -378,6 +375,37 @@ dat |>
 
 
 ```
+
+
+```{r}
+dat |> 
+  group_by(loc, year) |> 
+  summarise( mean_yield = mean(yield, na.rm = TRUE), 
+             n = n(),
+             .groups = "drop" )
+```
+
+
+
+# Practice exercises
+
+The exercises are based on the data `yield.xlsx`, so first read the file and save it in the object `df`.
+
+1. Verify how many observations and variables are in the dataset and what are the categories of the variables.
+
+2. Select just the column `location`, `plot`, `block`, `trt`, `system`, `wheat_yield_bu_acre_13.5`,
+`soy_yield_bu_acre_13`
+
+3. Rename the variables that contain the wheat and soybean yield.
+
+4. Verify if there are any NAs in the dataset.
+
+5. Filter only the SW system and calculate the mean wheat yield for each location.
+
+6. Calculate the mean and standard deviation for each system for wheat and soybean yield.
+
+
+ 
 
 
 
